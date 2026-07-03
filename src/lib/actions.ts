@@ -93,29 +93,14 @@ export async function deleteClientRecord(formData: FormData) {
 }
 
 /**
- * Creates a new open thread (optionally for a brand-new client) and its
- * first logged message. This is the "client just pinged me" fast path, so it
- * accepts either an existing client id or inline new-client fields.
+ * Creates a new open thread for an existing client and its first logged
+ * message.
  */
 export async function createIssue(formData: FormData) {
   const supabase = await createClient();
 
-  let clientId = optStr(formData, "client_id");
-  if (!clientId) {
-    const name = str(formData, "new_client_name");
-    if (!name) throw new Error("Client name is required.");
-    const { data: client, error: clientError } = await supabase
-      .from("clients")
-      .insert({
-        name,
-        company: optStr(formData, "new_client_company"),
-        contact_info: optStr(formData, "new_client_contact"),
-      })
-      .select()
-      .single();
-    if (clientError) throw new Error(clientError.message);
-    clientId = client.id;
-  }
+  const clientId = str(formData, "client_id");
+  if (!clientId) throw new Error("Missing client.");
 
   const title = str(formData, "title");
   if (!title) throw new Error("A short summary is required.");

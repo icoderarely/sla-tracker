@@ -5,19 +5,15 @@ import { createIssue } from "@/lib/actions";
 import type { Client } from "@/lib/types";
 
 export default function NewIssueDialog({
-  clients,
-  fixedClient,
+  client,
   triggerLabel = "New issue",
   triggerClassName,
 }: {
-  clients: Client[];
-  /** When set, skips the client picker and locks the issue to this client. */
-  fixedClient?: Client;
+  client: Client;
   triggerLabel?: string;
   triggerClassName?: string;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [useNewClient, setUseNewClient] = useState(!fixedClient && clients.length === 0);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +56,7 @@ export default function NewIssueDialog({
 
       <dialog
         ref={dialogRef}
-        className="backdrop:bg-black/40 bg-transparent p-0 m-auto rounded-xl w-full max-w-lg"
+        className="backdrop:bg-black/40 bg-transparent border-0 p-0 m-auto rounded-xl w-full max-w-lg"
         onClose={() => setPending(false)}
       >
         <form
@@ -79,75 +75,21 @@ export default function NewIssueDialog({
             </button>
           </div>
 
-          {fixedClient ? (
-            <div>
-              <label className="block text-xs font-medium text-muted mb-1">Client</label>
-              <input type="hidden" name="client_id" value={fixedClient.id} />
-              <div className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
-                {fixedClient.name}
-                {fixedClient.company ? ` — ${fixedClient.company}` : ""}
-              </div>
+          <div>
+            <p className="text-xs font-medium text-muted mb-1">Logging for</p>
+            <input type="hidden" name="client_id" value={client.id} />
+            <div className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+              {client.name}
+              {client.company ? ` — ${client.company}` : ""}
             </div>
-          ) : (
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-muted">Client</label>
-                {clients.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setUseNewClient((v) => !v)}
-                    className="text-xs text-primary-600 hover:underline"
-                  >
-                    {useNewClient ? "Pick existing client" : "New client"}
-                  </button>
-                )}
-              </div>
-
-              {useNewClient ? (
-                <div className="space-y-2">
-                  <input
-                    name="new_client_name"
-                    required
-                    placeholder="Client name"
-                    autoFocus
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      name="new_client_company"
-                      placeholder="Company (optional)"
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      name="new_client_contact"
-                      placeholder="Email / phone / Slack"
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <select
-                  name="client_id"
-                  required
-                  autoFocus
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  {clients.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                      {c.company ? ` — ${c.company}` : ""}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
+          </div>
 
           <div>
             <label className="block text-xs font-medium text-muted mb-1">Summary</label>
             <input
               name="title"
               required
+              autoFocus
               placeholder="e.g. Export button throws 500"
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />

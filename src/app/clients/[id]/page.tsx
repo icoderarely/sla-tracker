@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { getClientWithThreads } from "@/lib/queries";
 import { SeverityBadge, TagBadge } from "@/components/SeverityTag";
 import { ClientTypeBadge } from "@/components/ClientTypeBadge";
+import NewIssueDialog from "@/components/NewIssueDialog";
 
 export const dynamic = "force-dynamic";
 
@@ -28,14 +29,17 @@ export default async function ClientPage({
         </Link>
       </div>
 
-      <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold">{client.name}</h1>
-          <ClientTypeBadge type={client.client_type} />
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-semibold">{client.name}</h1>
+            <ClientTypeBadge type={client.client_type} />
+          </div>
+          <p className="text-sm text-muted mt-0.5">
+            {[client.company, client.contact_info].filter(Boolean).join(" · ") || "No additional details"}
+          </p>
         </div>
-        <p className="text-sm text-muted mt-0.5">
-          {[client.company, client.contact_info].filter(Boolean).join(" · ") || "No additional details"}
-        </p>
+        <NewIssueDialog client={client} />
       </div>
 
       <section className="space-y-2">

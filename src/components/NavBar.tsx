@@ -29,12 +29,6 @@ export default async function NavBar() {
               Dashboard
             </Link>
             <Link
-              href="/clients"
-              className="px-3 py-1.5 rounded-md text-muted hover:text-foreground hover:bg-surface-muted transition-colors"
-            >
-              Clients
-            </Link>
-            <Link
               href="/history"
               className="px-3 py-1.5 rounded-md text-muted hover:text-foreground hover:bg-surface-muted transition-colors"
             >
