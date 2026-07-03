@@ -21,40 +21,29 @@ again or mark it resolved.
 3. **Create a user**: Authentication → Users → Add user (or enable sign-ups
    and use the magic-link flow from the login page). There's no public
    sign-up form in the app itself, by design.
-4. **Copy env vars**: `cp .env.example .env.local` and fill in:
-   - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Project
-     Settings → API.
-   - `SUPABASE_SERVICE_ROLE_KEY` — same page; used only server-side by the
-     SLA cron route.
-   - `CRON_SECRET` — any long random string; the external scheduler must send
-     it back as `Authorization: Bearer <value>`.
-   - `SLA_ALERT_WEBHOOK_URL` — optional. If set, the cron route POSTs a JSON
-     payload here whenever a thread crosses the 2-hour mark (point it at a
-     Slack incoming webhook, or a Zapier/Make hook that forwards to
-     email/SMS).
+4. **Copy env vars**: `cp .env.example .env.local` and fill in
+   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` from Project
+   Settings → API.
 5. **Install and run**:
    ```bash
    npm install
    npm run dev
    ```
 
-## SLA background checks (cron)
+## SLA alerting
 
-The app watches SLA deadlines client-side via the browser Notification API
-while a tab is open (`NotificationWatcher`), but that can't fire if nobody
-has the app open — so `/api/cron/sla-check` exists to be polled externally
-every 10-15 minutes. It flags newly-overdue threads and optionally calls
-`SLA_ALERT_WEBHOOK_URL`.
+Alerting is entirely browser-based: while a tab has the app open,
+`NotificationWatcher` polls open threads and fires a native browser
+Notification (via the Notification API) the instant one crosses the 2-hour
+mark. Click "Enable alerts" in the nav bar to grant permission.
 
-**Vercel Hobby plan caps cron jobs at once per day**, which is too coarse for
-a 2-hour SLA. Options:
-
-- Upgrade to Vercel Pro (supports frequent crons) and keep the included
-  `vercel.json` (`*/15 * * * *`).
-- Use a free external scheduler (e.g. [cron-job.org](https://cron-job.org),
-  a GitHub Actions scheduled workflow, or a Supabase scheduled Edge Function)
-  to hit `https://<your-app>/api/cron/sla-check` every 10-15 minutes with
-  header `Authorization: Bearer <CRON_SECRET>`.
+There's no cron job, external scheduler, or third-party integration
+(Slack/email/webhook) — Vercel Cron's frequency limits on the Hobby plan
+made that path unreliable for a 2-hour SLA, so this app deliberately doesn't
+depend on background jobs. The dashboard's urgency coloring is always
+correct the moment you open it regardless, since it's computed live from
+message timestamps rather than a cached flag. The tradeoff: if no tab is
+open, you won't get a push alert — you'll see it as soon as you check in.
 
 ## Data model
 

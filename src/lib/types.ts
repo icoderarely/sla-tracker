@@ -20,7 +20,6 @@ export interface Thread {
   tag: IssueTag | null;
   created_at: string;
   resolved_at: string | null;
-  sla_breach_notified_at: string | null;
 }
 
 export interface Message {

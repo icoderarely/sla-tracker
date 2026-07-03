@@ -23,8 +23,7 @@ create table if not exists threads (
   severity text check (severity in ('P0', 'P1', 'P2', 'P3')),
   tag text check (tag in ('bug', 'feature', 'question')),
   created_at timestamptz not null default now(),
-  resolved_at timestamptz,
-  sla_breach_notified_at timestamptz
+  resolved_at timestamptz
 );
 
 create table if not exists messages (

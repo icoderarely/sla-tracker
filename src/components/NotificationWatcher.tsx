@@ -9,9 +9,10 @@ import type { Message, Thread } from "@/lib/types";
 const POLL_MS = 60_000;
 
 /**
- * Client-side companion to the /api/cron/sla-check route: while this tab is
- * open, it polls open threads and fires a browser Notification the moment
- * one crosses the 2-hour mark, without waiting for the external cron pass.
+ * While this tab is open, polls open threads and fires a browser
+ * Notification the moment one crosses the 2-hour mark. This is the only
+ * alerting mechanism in the app — there is no email/Slack/webhook
+ * integration, and no alerting fires while the app isn't open.
  */
 export default function NotificationWatcher() {
   const notifiedRef = useRef<Set<string>>(new Set());

@@ -140,7 +140,7 @@ export async function reopenThread(formData: FormData) {
 
   const { data: thread, error } = await supabase
     .from("threads")
-    .update({ status: "open", resolved_at: null, sla_breach_notified_at: null })
+    .update({ status: "open", resolved_at: null })
     .eq("id", threadId)
     .select()
     .single();
