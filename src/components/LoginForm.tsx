@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "password" | "magic-link";
+
+const MAGIC_LINK_COOLDOWN_SECONDS = 60;
+
+function isRateLimitError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err);
+  return /rate limit/i.test(message);
+}
 
 export default function LoginForm() {
   const router = useRouter();
@@ -15,9 +22,19 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownRemaining((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (mode === "magic-link" && cooldownRemaining > 0) return;
     setError(null);
     setLoading(true);
     const supabase = createClient();
@@ -38,9 +55,15 @@ export default function LoginForm() {
         });
         if (error) throw error;
         setMagicLinkSent(true);
+        setCooldownRemaining(MAGIC_LINK_COOLDOWN_SECONDS);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      if (mode === "magic-link" && isRateLimitError(err)) {
+        setError("Too many magic link requests. Please wait a minute before trying again.");
+        setCooldownRemaining(MAGIC_LINK_COOLDOWN_SECONDS);
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      }
     } finally {
       setLoading(false);
     }
@@ -52,6 +75,11 @@ export default function LoginForm() {
         <p className="text-sm">
           Check <span className="font-medium">{email}</span> for a sign-in link.
         </p>
+        {cooldownRemaining > 0 && (
+          <p className="mt-2 text-xs text-muted">
+            You can request another link in {cooldownRemaining}s.
+          </p>
+        )}
         <button
           type="button"
           onClick={() => setMagicLinkSent(false)}
@@ -102,10 +130,16 @@ export default function LoginForm() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (mode === "magic-link" && cooldownRemaining > 0)}
         className="w-full rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium py-2.5 transition-colors disabled:opacity-50"
       >
-        {loading ? "Signing in…" : mode === "password" ? "Sign in" : "Send magic link"}
+        {loading
+          ? "Signing in…"
+          : mode === "magic-link" && cooldownRemaining > 0
+            ? `Try again in ${cooldownRemaining}s`
+            : mode === "password"
+              ? "Sign in"
+              : "Send magic link"}
       </button>
 
       <button
