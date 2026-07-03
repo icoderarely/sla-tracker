@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { IssueTag, Severity } from "@/lib/types";
+import type { ClientType, IssueTag, Severity } from "@/lib/types";
 
 function str(formData: FormData, key: string): string {
   return String(formData.get(key) ?? "").trim();
@@ -12,6 +12,10 @@ function str(formData: FormData, key: string): string {
 function optStr(formData: FormData, key: string): string | null {
   const v = str(formData, key);
   return v.length > 0 ? v : null;
+}
+
+function clientType(formData: FormData): ClientType {
+  return formData.get("client_type") === "b2c" ? "b2c" : "b2b";
 }
 
 export async function createClientRecord(formData: FormData) {
@@ -25,13 +29,67 @@ export async function createClientRecord(formData: FormData) {
       name,
       company: optStr(formData, "company"),
       contact_info: optStr(formData, "contact_info"),
+      client_type: clientType(formData),
     })
     .select()
     .single();
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
+  revalidatePath("/clients");
   return data;
+}
+
+export async function updateClientRecord(formData: FormData) {
+  const supabase = await createClient();
+  const clientId = str(formData, "client_id");
+  const name = str(formData, "name");
+  if (!clientId) throw new Error("Missing client id.");
+  if (!name) throw new Error("Client name is required.");
+
+  const { error } = await supabase
+    .from("clients")
+    .update({
+      name,
+      company: optStr(formData, "company"),
+      contact_info: optStr(formData, "contact_info"),
+      client_type: clientType(formData),
+    })
+    .eq("id", clientId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/clients");
+  revalidatePath(`/clients/${clientId}`);
+}
+
+export async function updateClientType(formData: FormData) {
+  const supabase = await createClient();
+  const clientId = str(formData, "client_id");
+  if (!clientId) throw new Error("Missing client id.");
+
+  const { error } = await supabase
+    .from("clients")
+    .update({ client_type: clientType(formData) })
+    .eq("id", clientId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/clients");
+  revalidatePath(`/clients/${clientId}`);
+}
+
+export async function deleteClientRecord(formData: FormData) {
+  const supabase = await createClient();
+  const clientId = str(formData, "client_id");
+  if (!clientId) throw new Error("Missing client id.");
+
+  const { error } = await supabase.from("clients").delete().eq("id", clientId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/");
+  revalidatePath("/clients");
+  revalidatePath("/history");
 }
 
 /**

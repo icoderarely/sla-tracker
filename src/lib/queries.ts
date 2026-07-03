@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Client, Message, Thread, ThreadWithMessages } from "@/lib/types";
+import type {
+  Client,
+  ClientWithThreadSummary,
+  Message,
+  Thread,
+  ThreadWithMessages,
+} from "@/lib/types";
 
 export async function getOpenThreadsWithMessages(): Promise<ThreadWithMessages[]> {
   const supabase = await createClient();
@@ -35,6 +41,36 @@ export async function getThreadWithMessages(
 
   if (error) throw new Error(error.message);
   return data as unknown as ThreadWithMessages | null;
+}
+
+export async function getClientsWithThreadSummaries(): Promise<
+  ClientWithThreadSummary[]
+> {
+  const supabase = await createClient();
+  const [{ data: clients, error: clientsError }, { data: threads, error: threadsError }] =
+    await Promise.all([
+      supabase.from("clients").select("*").order("name", { ascending: true }),
+      supabase.from("threads").select("*").order("created_at", { ascending: false }),
+    ]);
+
+  if (clientsError) throw new Error(clientsError.message);
+  if (threadsError) throw new Error(threadsError.message);
+
+  const threadsByClient = new Map<string, Thread[]>();
+  for (const thread of threads ?? []) {
+    const existing = threadsByClient.get(thread.client_id);
+    if (existing) existing.push(thread);
+    else threadsByClient.set(thread.client_id, [thread]);
+  }
+
+  return (clients ?? []).map((client) => {
+    const clientThreads = threadsByClient.get(client.id) ?? [];
+    return {
+      ...client,
+      openThreads: clientThreads.filter((t) => t.status === "open"),
+      resolvedCount: clientThreads.filter((t) => t.status === "resolved").length,
+    };
+  });
 }
 
 export async function getClientWithThreads(

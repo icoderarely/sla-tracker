@@ -27,6 +27,13 @@
   --warning-bg: #fef3c7;
   --danger: #dc2626;
   --danger-bg: #fee2e2;
+
+  --b2b: #2563eb;
+  --b2b-bg: #eff6ff;
+  --b2b-border: #bfdbfe;
+  --b2c: #0d9488;
+  --b2c-bg: #f0fdfa;
+  --b2c-border: #99f6e4;
 }
 
 .dark {
@@ -54,6 +61,13 @@
   --warning-bg: #78350f;
   --danger: #f87171;
   --danger-bg: #7f1d1d;
+
+  --b2b: #60a5fa;
+  --b2b-bg: #1e3a5f;
+  --b2b-border: #2c5282;
+  --b2c: #2dd4bf;
+  --b2c-bg: #134e4a;
+  --b2c-border: #115e59;
 }
 
 @theme inline {
@@ -81,6 +95,13 @@
   --color-warning-bg: var(--warning-bg);
   --color-danger: var(--danger);
   --color-danger-bg: var(--danger-bg);
+
+  --color-b2b: var(--b2b);
+  --color-b2b-bg: var(--b2b-bg);
+  --color-b2b-border: var(--b2b-border);
+  --color-b2c: var(--b2c);
+  --color-b2c-bg: var(--b2c-bg);
+  --color-b2c-border: var(--b2c-border);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

@@ -12,8 +12,15 @@ create table if not exists clients (
   name text not null,
   company text,
   contact_info text,
+  client_type text not null default 'b2b' check (client_type in ('b2b', 'b2c')),
   created_at timestamptz not null default now()
 );
+
+-- Migration for installs that already ran the create table above without
+-- client_type.
+alter table clients add column if not exists client_type text not null default 'b2b';
+alter table clients drop constraint if exists clients_client_type_check;
+alter table clients add constraint clients_client_type_check check (client_type in ('b2b', 'b2c'));
 
 create table if not exists threads (
   id uuid primary key default gen_random_uuid(),
