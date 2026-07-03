@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #faf9fc;
+  --surface: #ffffff;
+  --surface-muted: #f3f0f9;
+  --border: #e4dff2;
+  --foreground: #211a33;
+  --muted: #6b6280;
+
+  --primary-50: #f5f2ff;
+  --primary-100: #ede7fe;
+  --primary-200: #dcd2fd;
+  --primary-300: #c2adfb;
+  --primary-400: #a682f7;
+  --primary-500: #8b5cf6;
+  --primary-600: #7c3aed;
+  --primary-700: #6d28d9;
+  --primary-800: #5b21b6;
+  --primary-900: #4c1d95;
+
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --warning: #b45309;
+  --warning-bg: #fef3c7;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+}
+
+.dark {
+  --background: #14101f;
+  --surface: #1c1730;
+  --surface-muted: #241d3a;
+  --border: #322a4c;
+  --foreground: #f1edfb;
+  --muted: #a79cc4;
+
+  --primary-50: #241d3a;
+  --primary-100: #2d2447;
+  --primary-200: #3d3160;
+  --primary-300: #5b4a8a;
+  --primary-400: #8b5cf6;
+  --primary-500: #a682f7;
+  --primary-600: #bda4fa;
+  --primary-700: #c2adfb;
+  --primary-800: #dcd2fd;
+  --primary-900: #ede7fe;
+
+  --success: #4ade80;
+  --success-bg: #14532d;
+  --warning: #fbbf24;
+  --warning-bg: #78350f;
+  --danger: #f87171;
+  --danger-bg: #7f1d1d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+::selection {
+  background: var(--primary-300);
+  color: var(--primary-900);
+}
