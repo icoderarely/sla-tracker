@@ -61,7 +61,7 @@ export default function ClientFormDialog({
 
       <dialog
         ref={dialogRef}
-        className="backdrop:bg-black/40 bg-transparent p-0 m-auto rounded-xl w-full max-w-md"
+        className="backdrop:bg-black/40 bg-transparent border-0 p-0 m-auto rounded-xl w-full max-w-md"
         onClose={() => setPending(false)}
       >
         <form

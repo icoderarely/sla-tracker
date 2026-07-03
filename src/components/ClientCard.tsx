@@ -74,8 +74,7 @@ export default function ClientCard({ client }: { client: ClientWithThreadSummary
       </div>
 
       <NewIssueDialog
-        clients={[]}
-        fixedClient={client}
+        client={client}
         triggerLabel="New issue"
         triggerClassName="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface hover:border-primary-400 text-sm font-medium px-3.5 py-2 transition-colors"
       />
