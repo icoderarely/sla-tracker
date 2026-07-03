@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { getClientWithThreads } from "@/lib/queries";
 import { SeverityBadge, TagBadge } from "@/components/SeverityTag";
+import { ClientTypeBadge } from "@/components/ClientTypeBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,10 @@ export default async function ClientPage({
       </div>
 
       <div>
-        <h1 className="text-lg font-semibold">{client.name}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg font-semibold">{client.name}</h1>
+          <ClientTypeBadge type={client.client_type} />
+        </div>
         <p className="text-sm text-muted mt-0.5">
           {[client.company, client.contact_info].filter(Boolean).join(" · ") || "No additional details"}
         </p>
